@@ -1,18 +1,25 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from instagramapp.models import Post
-from .serializers import PostSerializers
+from .serializers import PostSerializers,PostSerializers2
+from django.db.models import Q
+
 
 
 @api_view(['POST','GET'])
 def getPost(req):
     if req.method=='GET':
-        Posts=Post.objects.all()
+        query = req.GET.get("id")
+        if query:
+            query=int(query)
+            Posts=Post.objects.filter(Q(user__id=query))
+        else:
+            Posts=Post.objects.all()
         serializers=PostSerializers(Posts,many=True)
         return Response(serializers.data)
     elif req.method=='POST':
         print(req.data)
-        serializer=PostSerializers(data=req.data)
+        serializer=PostSerializers2(data=req.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -30,7 +37,7 @@ def PostDetails(req,pk):
         return Response(serializers.data)
     elif req.method=='PUT':
         post=Post.objects.get(id=pk)
-        serializer=PostSerializers(post,data=req.data)
+        serializer=PostSerializers2(post,data=req.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
