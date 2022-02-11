@@ -37,7 +37,7 @@ def PostDetails(req,pk):
         return Response(serializers.data)
     elif req.method=='PUT':
         post=Post.objects.get(id=pk)
-        serializer=PostSerializers2(post,data=req.data)
+        serializer=PostSerializers(post,data=req.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -35,27 +35,17 @@ def userDetails(req,pk):
         serializers=UserSerializers(user,many=False)
         return Response(serializers.data)
     elif req.method=="PUT":
-        print("hello")
-        user=User.objects.get(id=pk)
-        # user=UserSerializers2(user,many=False)
-        follower_id=req.data['follower_id']
-        userfollower=User.objects.get(id=follower_id)
-        x={
-            "followers":[14,15]
-        }
-        y={
-            "following":[pk]
-        }
-        # user['followers']=user['followers'].append(follower_id)
-        # userfollower['following']=pk
-        serializers1=UserSerializers2(user,data=x)
-        serializers2=UserSerializers2(userfollower,data=y)
-        if serializers1.is_valid() and serializers2.is_valid():
-            serializers1.save()
-            serializers2.save()
-            return Response("done")
-        else:
-            return Response(serializers1.errors or serializers2.errors) 
+        try:
+            user=User.objects.get(id=pk)
+            follow=User.objects.get(id=req.data.get('follow'))
+            user.following.add(follow)
+            user.save()
+            follow.followers.add(user)
+            follow.save()
+            return Response("Done")
+        except:
+            return Response("Something went wrong")
+
 
 
 @api_view(['POST'])

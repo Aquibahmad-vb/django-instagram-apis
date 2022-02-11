@@ -17,7 +17,7 @@ class User(AbstractUser):
 
     
 class Post(models.Model):
-    image=models.ImageField(null=True)
+    image=models.ImageField(null=True,upload_to='post_images')
     AboutImage=models.TextField(max_length=400,null=True)
     user=models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
     updated=models.DateTimeField(auto_now=True)
