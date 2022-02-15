@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from instagramapp.models import User
 from .serializers import UserSerializers,UserSerializers2
 from django.db.models import Q
+from django.contrib.auth.hashers import make_password, check_password
 
 
 
@@ -19,12 +20,14 @@ def getUser(req):
         serializers=UserSerializers(users,many=True)
         return Response(serializers.data)
     elif req.method=='POST':
+        req.data['password'] = make_password(req.data['password'])
         serializer=UserSerializers2(data=req.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+            
 
 
 
@@ -46,19 +49,27 @@ def userDetails(req,pk):
         except:
             return Response("Something went wrong")
 
+@api_view(['PUT'])
+def changePassword(req,pk):
+    if req.method=="PUT":
+        user=User.objects.get(id=pk)
+        req.data['password'] = make_password(req.data['password'])
+        seriliazer=UserSerializers2(user,data=req.data)
+        if seriliazer.is_valid():
+            seriliazer.save()
+            return Response("Password changeg")
+        else:
+            return Response({"msg":"something went wrong"})
 
 
 @api_view(['POST'])
 def login(req):
     if req.method=='POST':
-        print(req.data)
         username=req.data['username']
         password=req.data['password']
         try:
             user=User.objects.get(username=username)
-            # user=User.objects.get(password=password)
-            if user.password==password:
-                print("Logged in",user)
+            if check_password(password,user.password):
                 user=UserSerializers2(user,many=False)
                 return Response({"message":"Logged in","data":user.data})
             else:
