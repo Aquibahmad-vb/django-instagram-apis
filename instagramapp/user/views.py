@@ -38,7 +38,8 @@ def userDetails(req,pk):
         try:
             user=User.objects.get(id=pk)
             follow=User.objects.get(id=req.data.get('follow'))
-            user.following.add(follow)
+            test=follow
+            user.following.add(test)
             user.save()
             follow.followers.add(user)
             follow.save()
