@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from instagramapp.models import Post
 from .serializers import PostSerializers,PostSerializers2
@@ -7,6 +8,7 @@ from django.db.models import Q
 
 
 @api_view(['POST','GET'])
+@permission_classes([IsAuthenticated])
 def getPost(req):
     if req.method=='GET':
         query = req.GET.get("id")
@@ -30,6 +32,7 @@ def getPost(req):
 
 
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([IsAuthenticated])
 def PostDetails(req,pk):
     if req.method=='GET':
         post=Post.objects.get(id=pk)
